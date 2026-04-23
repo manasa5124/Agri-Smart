@@ -8,8 +8,12 @@ function Dashboard({ user }) {
   useEffect(() => {
     // Fetch quick stats
     fetchSavedLocations()
-    if (user?.location) {
-      fetchWeather(user.location)
+    if (user) {
+      // Use location, district, or state as fallback for weather
+      const location = user.location || user.district || user.state
+      if (location) {
+        fetchWeather(location)
+      }
     }
   }, [user])
 
@@ -111,7 +115,11 @@ function Dashboard({ user }) {
               <Cloud className="w-5 h-5 mr-2 text-blue-500" />
               Current Weather
             </h2>
-            {user?.location && <span className="badge badge-info">{user.location}</span>}
+            {user && (user.location || user.district || user.state) && (
+              <span className="badge badge-info">
+                {user.location || user.district || user.state}
+              </span>
+            )}
           </div>
           
           {weather ? (
