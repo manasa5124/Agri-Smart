@@ -4,7 +4,6 @@
  */
 
 const express = require('express');
-const cors = require('cors');
 const requestLogger = require('./middlewares/requestLogger.middleware');
 const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler.middleware');
 
@@ -22,10 +21,6 @@ const app = express();
 // Middleware
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-  credentials: true
-})); // Enable CORS
 app.use(requestLogger); // Log all requests
 
 // Health check endpoint
