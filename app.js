@@ -23,6 +23,21 @@ app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(requestLogger); // Log all requests
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Agri-Smart API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      docs: 'See API documentation for available endpoints'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
