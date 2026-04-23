@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import { Cloud, Search, Thermometer, Droplets, Wind, MapPin, Calendar, AlertCircle, Sun, CloudRain } from 'lucide-react'
 
 // Fallback weather data for common Indian cities
 const fallbackWeatherData = {
@@ -397,7 +398,6 @@ function WeatherInfo() {
       setWeather(response.data.data)
     } catch (err) {
       console.error('Error fetching weather:', err)
-      // Try fallback data
       const cityLower = city.toLowerCase().trim()
       const fallbackData = fallbackWeatherData[cityLower]
       
@@ -412,66 +412,141 @@ function WeatherInfo() {
     }
   }
 
+  const getWeatherIcon = (temp, rainfall) => {
+    if (rainfall > 0) return CloudRain
+    if (temp > 30) return Sun
+    return Cloud
+  }
+
+  const getWeatherCondition = (temp, rainfall) => {
+    if (rainfall > 0) return 'Rainy'
+    if (temp > 35) return 'Hot'
+    if (temp > 30) return 'Warm'
+    if (temp < 20) return 'Cool'
+    return 'Pleasant'
+  }
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Weather Information</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Weather Information</h1>
+          <p className="text-gray-600 mt-1">Real-time weather data for agricultural planning</p>
+        </div>
+        <div className="badge badge-info">
+          <Cloud className="w-4 h-4 mr-1" />
+          Live Data
+        </div>
+      </div>
       
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="card p-6">
         <form onSubmit={handleSearch} className="flex gap-4">
-          <input
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="Enter city name..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="Enter city name (e.g., Bangalore, Mumbai)..."
+              className="input-field pl-10"
+            />
+          </div>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:bg-gray-400"
+            className="btn-primary flex items-center space-x-2"
           >
-            {loading ? 'Loading...' : 'Search'}
+            <Search className="w-5 h-5" />
+            <span>{loading ? 'Loading...' : 'Search'}</span>
           </button>
         </form>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center">
+            <AlertCircle className="w-5 h-5 mr-2" />
             {error}
           </div>
         )}
         {info && (
-          <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded-lg">
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl flex items-center">
+            <Cloud className="w-5 h-5 mr-2" />
             {info}
           </div>
         )}
       </div>
 
       {weather && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {weather.location?.city}, {weather.location?.country}
-          </h2>
+        <div className="card p-8">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-800 flex items-center">
+                <MapPin className="w-6 h-6 mr-2 text-blue-600" />
+                {weather.location?.city}
+              </h2>
+              <p className="text-gray-600 mt-1">{weather.location?.country}</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="badge badge-info">{getWeatherCondition(weather.temperature, weather.rainfall)}</span>
+            </div>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-700 mb-2">Temperature</h3>
-              <p className="text-3xl font-bold text-blue-600">{weather.temperature}°C</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-6 border border-orange-200">
+              <div className="flex items-center justify-between mb-4">
+                <Thermometer className="w-8 h-8 text-orange-500" />
+                <span className="text-sm text-gray-600">Temperature</span>
+              </div>
+              <p className="text-4xl font-bold text-gray-800">{weather.temperature}°C</p>
+              <p className="text-sm text-gray-600 mt-2">Feels like {Math.round(weather.temperature - 2)}°C</p>
             </div>
             
-            <div className="bg-green-50 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-700 mb-2">Humidity</h3>
-              <p className="text-3xl font-bold text-green-600">{weather.humidity}%</p>
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
+              <div className="flex items-center justify-between mb-4">
+                <Droplets className="w-8 h-8 text-blue-500" />
+                <span className="text-sm text-gray-600">Humidity</span>
+              </div>
+              <p className="text-4xl font-bold text-gray-800">{weather.humidity}%</p>
+              <p className="text-sm text-gray-600 mt-2">Moderate level</p>
             </div>
             
-            <div className="bg-cyan-50 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-700 mb-2">Rainfall</h3>
-              <p className="text-3xl font-bold text-cyan-600">{weather.rainfall}mm</p>
+            <div className="bg-gradient-to-br from-cyan-50 to-teal-50 rounded-2xl p-6 border border-cyan-200">
+              <div className="flex items-center justify-between mb-4">
+                <CloudRain className="w-8 h-8 text-cyan-500" />
+                <span className="text-sm text-gray-600">Rainfall</span>
+              </div>
+              <p className="text-4xl font-bold text-gray-800">{weather.rainfall}mm</p>
+              <p className="text-sm text-gray-600 mt-2">{weather.rainfall > 0 ? 'Rain expected' : 'No rain'}</p>
             </div>
           </div>
 
-          <div className="mt-4 text-sm text-gray-500">
-            <p>Coordinates: {weather.location?.latitude}, {weather.location?.longitude}</p>
-            <p>Last updated: {new Date(weather.timestamp).toLocaleString()}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-6 border border-gray-200">
+              <h3 className="font-semibold text-gray-700 mb-4 flex items-center">
+                <MapPin className="w-4 h-4 mr-2 text-gray-600" />
+                Location Details
+              </h3>
+              <div className="space-y-2 text-sm">
+                <p className="flex justify-between">
+                  <span className="text-gray-600">Latitude:</span>
+                  <span className="font-semibold text-gray-800">{weather.location?.latitude}</span>
+                </p>
+                <p className="flex justify-between">
+                  <span className="text-gray-600">Longitude:</span>
+                  <span className="font-semibold text-gray-800">{weather.location?.longitude}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
+              <h3 className="font-semibold text-gray-700 mb-4 flex items-center">
+                <Calendar className="w-4 h-4 mr-2 text-green-600" />
+                Last Updated
+              </h3>
+              <p className="text-lg font-semibold text-gray-800">
+                {new Date(weather.timestamp).toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-600 mt-2">Real-time data</p>
+            </div>
           </div>
         </div>
       )}

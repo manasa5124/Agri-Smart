@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { Leaf, MapPin, Search, Bell, Trash2, AlertCircle, Calendar, CheckCircle, Loader2 } from 'lucide-react'
 
 // Fallback states data in case backend is not available
 const fallbackStates = [
@@ -270,22 +271,33 @@ function SoilDataPrediction() {
   const selectedStateData = states.find(s => s.name.toLowerCase() === formData.state.toLowerCase())
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Soil Data Prediction</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Soil Data Prediction</h1>
+          <p className="text-gray-600 mt-1">Predict soil parameters based on your location</p>
+        </div>
         <button
           onClick={() => setShowSaved(!showSaved)}
-          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          className={`btn-secondary flex items-center space-x-2 ${showSaved ? 'bg-green-50 border-green-300 text-green-700' : ''}`}
         >
-          {showSaved ? 'Hide Saved' : 'View Saved'}
+          <Bell className="w-5 h-5" />
+          <span>{showSaved ? 'Hide Saved' : 'View Saved'}</span>
         </button>
       </div>
       
       {showSaved && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Saved Locations</h2>
+        <div className="card p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <Bell className="w-5 h-5 mr-2 text-orange-500" />
+            Saved Locations & Reminders
+          </h2>
           {savedLocations.length === 0 ? (
-            <p className="text-gray-500">No saved locations yet.</p>
+            <div className="text-center py-8 text-gray-500">
+              <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>No saved locations yet</p>
+              <p className="text-sm">Save locations to get 3-month reminders</p>
+            </div>
           ) : (
             <div className="space-y-4">
               {savedLocations.map((location) => {
@@ -294,26 +306,45 @@ function SoilDataPrediction() {
                 const isUrgent = daysUntilReminder <= 7
                 
                 return (
-                  <div key={location._id} className={`p-4 border rounded-lg ${isUrgent ? 'border-orange-500 bg-orange-50' : 'border-gray-200'}`}>
+                  <div key={location._id} className={`p-4 rounded-xl border-2 ${isUrgent ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-white'}`}>
                     <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold text-gray-800">
-                          {location.state}
-                          {location.district && `, ${location.district}`}
-                          {location.taluk && `, ${location.taluk}`}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          N: {location.soilData.nitrogen}, P: {location.soilData.phosphorus}, K: {location.soilData.potassium}, pH: {location.soilData.ph}
-                        </p>
-                        <p className={`text-sm mt-2 ${isUrgent ? 'text-orange-600 font-semibold' : 'text-gray-500'}`}>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <MapPin className="w-4 h-4 text-gray-500" />
+                          <h3 className="font-semibold text-gray-800">
+                            {location.state}
+                            {location.district && `, ${location.district}`}
+                            {location.taluk && `, ${location.taluk}`}
+                          </h3>
+                        </div>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                          <span className="flex items-center">
+                            <Leaf className="w-3 h-3 mr-1 text-green-500" />
+                            N: {location.soilData.nitrogen}
+                          </span>
+                          <span className="flex items-center">
+                            <Leaf className="w-3 h-3 mr-1 text-blue-500" />
+                            P: {location.soilData.phosphorus}
+                          </span>
+                          <span className="flex items-center">
+                            <Leaf className="w-3 h-3 mr-1 text-orange-500" />
+                            K: {location.soilData.potassium}
+                          </span>
+                          <span className="flex items-center">
+                            <Leaf className="w-3 h-3 mr-1 text-purple-500" />
+                            pH: {location.soilData.ph}
+                          </span>
+                        </div>
+                        <div className={`flex items-center text-sm ${isUrgent ? 'text-orange-600 font-semibold' : 'text-gray-500'}`}>
+                          <Calendar className="w-4 h-4 mr-1" />
                           {isUrgent ? '⚠️ ' : '📅 '}Reminder in {daysUntilReminder} days ({reminderDate.toLocaleDateString()})
-                        </p>
+                        </div>
                       </div>
                       <button
                         onClick={() => handleDeleteLocation(location._id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="ml-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                       >
-                        Delete
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
@@ -324,19 +355,22 @@ function SoilDataPrediction() {
         </div>
       )}
       
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Enter Location Details</h2>
+      <div className="card p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+          <MapPin className="w-5 h-5 mr-2 text-green-600" />
+          Enter Location Details
+        </h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               State *
             </label>
             <select
               name="state"
               value={formData.state}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="input-field"
               required
             >
               <option value="">Select State</option>
@@ -350,14 +384,14 @@ function SoilDataPrediction() {
 
           {selectedStateData && (
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 District (Optional)
               </label>
               <select
                 name="district"
                 value={formData.district}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="input-field"
               >
                 <option value="">Select District</option>
                 {selectedStateData.districts.map((district) => (
@@ -371,92 +405,130 @@ function SoilDataPrediction() {
 
           {formData.district && (
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Taluk (Optional)
               </label>
-              <input
-                type="text"
-                name="taluk"
-                value={formData.taluk}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter taluk name"
-              />
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  name="taluk"
+                  value={formData.taluk}
+                  onChange={handleChange}
+                  className="input-field pl-10"
+                  placeholder="Enter taluk name"
+                />
+              </div>
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:bg-gray-400"
+            className="btn-primary w-full flex items-center justify-center space-x-2"
           >
-            {loading ? 'Predicting...' : 'Predict Soil Data'}
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Predicting...</span>
+              </>
+            ) : (
+              <>
+                <Search className="w-5 h-5" />
+                <span>Predict Soil Data</span>
+              </>
+            )}
           </button>
         </form>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center">
+            <AlertCircle className="w-5 h-5 mr-2" />
             {error}
           </div>
         )}
         {info && (
-          <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded-lg">
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl flex items-center">
+            <Leaf className="w-5 h-5 mr-2" />
             {info}
           </div>
         )}
       </div>
 
       {result && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold text-primary-600 mb-4">
+        <div className="card p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <Leaf className="w-6 h-6 mr-2 text-green-600" />
             Predicted Soil Data
           </h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <h3 className="font-semibold text-gray-700 mb-2">Nitrogen (N)</h3>
-              <p className="text-2xl font-bold text-blue-600">{result.nitrogen}</p>
-              <p className="text-xs text-gray-500">kg/ha</p>
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 text-center border border-blue-200">
+              <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-blue-600 font-bold text-lg">N</span>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">{result.nitrogen}</p>
+              <p className="text-sm text-gray-600 mt-1">kg/ha</p>
             </div>
             
-            <div className="bg-green-50 rounded-lg p-4 text-center">
-              <h3 className="font-semibold text-gray-700 mb-2">Phosphorus (P)</h3>
-              <p className="text-2xl font-bold text-green-600">{result.phosphorus}</p>
-              <p className="text-xs text-gray-500">kg/ha</p>
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 text-center border border-green-200">
+              <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-green-600 font-bold text-lg">P</span>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">{result.phosphorus}</p>
+              <p className="text-sm text-gray-600 mt-1">kg/ha</p>
             </div>
             
-            <div className="bg-orange-50 rounded-lg p-4 text-center">
-              <h3 className="font-semibold text-gray-700 mb-2">Potassium (K)</h3>
-              <p className="text-2xl font-bold text-orange-600">{result.potassium}</p>
-              <p className="text-xs text-gray-500">kg/ha</p>
+            <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-6 text-center border border-orange-200">
+              <div className="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-orange-600 font-bold text-lg">K</span>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">{result.potassium}</p>
+              <p className="text-sm text-gray-600 mt-1">kg/ha</p>
             </div>
             
-            <div className="bg-purple-50 rounded-lg p-4 text-center">
-              <h3 className="font-semibold text-gray-700 mb-2">pH Level</h3>
-              <p className="text-2xl font-bold text-purple-600">{result.ph}</p>
-              <p className="text-xs text-gray-500">0-14 scale</p>
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 text-center border border-purple-200">
+              <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-purple-600 font-bold text-lg">pH</span>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">{result.ph}</p>
+              <p className="text-sm text-gray-600 mt-1">0-14 scale</p>
             </div>
           </div>
 
-          <div className="mb-4 p-4 bg-yellow-50 rounded-lg">
-            <h3 className="font-semibold text-gray-700 mb-2">Data Source</h3>
-            <p className="text-gray-600 capitalize">{result.source}</p>
-            <p className="text-sm text-gray-500 mt-1">{result.note}</p>
+          <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
+            <div className="flex items-center mb-2">
+              <CheckCircle className="w-5 h-5 mr-2 text-yellow-600" />
+              <h3 className="font-semibold text-gray-700">Data Source</h3>
+            </div>
+            <p className="text-gray-800 capitalize font-medium">{result.source}</p>
+            <p className="text-sm text-gray-600 mt-1">{result.note}</p>
           </div>
 
           <div className="flex gap-4">
             <button
               onClick={handleSaveLocation}
               disabled={saving}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+              className="flex-1 btn-secondary flex items-center justify-center space-x-2"
             >
-              {saving ? 'Saving...' : '🔔 Save Location (3-month reminder)'}
+              {saving ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Bell className="w-5 h-5" />
+                  <span>Save Location (3-month reminder)</span>
+                </>
+              )}
             </button>
             <button
               onClick={handleUseForRecommendation}
-              className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+              className="flex-1 btn-primary flex items-center justify-center space-x-2"
             >
-              Use for Crop Recommendation
+              <Leaf className="w-5 h-5" />
+              <span>Use for Crop Recommendation</span>
             </button>
           </div>
         </div>

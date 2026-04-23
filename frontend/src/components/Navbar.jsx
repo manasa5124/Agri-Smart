@@ -1,90 +1,85 @@
 import React from 'react'
+import { Sprout, TrendingUp, Cloud, Leaf, LogIn, UserPlus, LogOut, User, LayoutDashboard, Calculator, Calendar } from 'lucide-react'
 
 function Navbar({ activeTab, setActiveTab, user, onLogout }) {
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'crop', label: 'Crop Recommendation', icon: Sprout },
+    { id: 'market', label: 'Market Prices', icon: TrendingUp },
+    { id: 'weather', label: 'Weather', icon: Cloud },
+    { id: 'soil', label: 'Soil Data', icon: Leaf },
+    { id: 'fertilizer', label: 'Fertilizer Calculator', icon: Calculator },
+    { id: 'calendar', label: 'Crop Calendar', icon: Calendar },
+  ]
+
   return (
-    <nav className="bg-primary-600 text-white shadow-lg">
+    <nav className="bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-xl sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <span className="text-2xl font-bold">🌱 Agri-Smart</span>
+          <div className="flex items-center space-x-3">
+            <div className="bg-white/20 p-2 rounded-xl">
+              <Sprout className="w-6 h-6" />
+            </div>
+            <span className="text-2xl font-bold tracking-tight">Agri-Smart</span>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setActiveTab('crop')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  activeTab === 'crop'
-                    ? 'bg-white text-primary-600 font-semibold'
-                    : 'hover:bg-primary-700'
-                }`}
-              >
-                Crop Recommendation
-              </button>
-              <button
-                onClick={() => setActiveTab('market')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  activeTab === 'market'
-                    ? 'bg-white text-primary-600 font-semibold'
-                    : 'hover:bg-primary-700'
-                }`}
-              >
-                Market Prices
-              </button>
-              <button
-                onClick={() => setActiveTab('weather')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  activeTab === 'weather'
-                    ? 'bg-white text-primary-600 font-semibold'
-                    : 'hover:bg-primary-700'
-                }`}
-              >
-                Weather
-              </button>
-              <button
-                onClick={() => setActiveTab('soil')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  activeTab === 'soil'
-                    ? 'bg-white text-primary-600 font-semibold'
-                    : 'hover:bg-primary-700'
-                }`}
-              >
-                Soil Data
-              </button>
-            </div>
+          <div className="flex items-center space-x-1">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                    activeTab === item.id
+                      ? 'bg-white text-green-600 font-semibold shadow-lg'
+                      : 'hover:bg-white/10'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="hidden md:inline">{item.label}</span>
+                </button>
+              )
+            })}
             
-            <div className="border-l border-white/30 pl-4">
+            <div className="border-l border-white/30 pl-4 ml-2">
               {user ? (
                 <div className="flex items-center space-x-3">
-                  <span className="text-sm">Welcome, {user.name}</span>
+                  <div className="flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-xl">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm font-medium hidden sm:inline">{user.name}</span>
+                  </div>
                   <button
                     onClick={onLogout}
-                    className="px-3 py-1 bg-red-500 hover:bg-red-600 rounded-lg text-sm transition-colors"
+                    className="flex items-center space-x-2 px-3 py-2 bg-red-500 hover:bg-red-600 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
                   >
-                    Logout
+                    <LogOut className="w-4 h-4" />
+                    <span className="hidden sm:inline">Logout</span>
                   </button>
                 </div>
               ) : (
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setActiveTab('login')}
-                    className={`px-4 py-2 rounded-lg transition-colors ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
                       activeTab === 'login'
-                        ? 'bg-white text-primary-600 font-semibold'
-                        : 'hover:bg-primary-700'
+                        ? 'bg-white text-green-600 font-semibold shadow-lg'
+                        : 'hover:bg-white/10'
                     }`}
                   >
-                    Login
+                    <LogIn className="w-4 h-4" />
+                    <span className="hidden sm:inline">Login</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('register')}
-                    className={`px-4 py-2 rounded-lg transition-colors ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
                       activeTab === 'register'
-                        ? 'bg-white text-primary-600 font-semibold'
-                        : 'hover:bg-primary-700'
+                        ? 'bg-white text-green-600 font-semibold shadow-lg'
+                        : 'hover:bg-white/10'
                     }`}
                   >
-                    Register
+                    <UserPlus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Register</span>
                   </button>
                 </div>
               )}
